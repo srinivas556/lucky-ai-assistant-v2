@@ -1,0 +1,7 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MODEL = os.getenv("JARVIS_MODEL", "qwen3:4b")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")

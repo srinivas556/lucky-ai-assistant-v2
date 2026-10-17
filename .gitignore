@@ -1,0 +1,33 @@
+# Python environments and cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Editors and logs
+.vscode/
+.idea/
+logs/
+
+# Local databases
+*.db
+*.sqlite3
+
+# Test recordings and audio
+tests/recording.wav
+*.wav
+
+# Whisper models and compiled binaries
+whisper/models/*.bin
+whisper/Release/
+
+# OS files
+.DS_Store
+Thumbs.db
