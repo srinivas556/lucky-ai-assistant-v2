@@ -22,6 +22,7 @@
     @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
     @media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:0;width:270px;transform:translateX(-105%);transition:transform .22s ease;box-shadow:var(--shadow)}.sidebar.open{transform:translateX(0)}.mobile-menu{display:block}.topbar{height:62px;padding:0 16px}.workspace{padding:35px 17px 12px}.welcome{margin:auto 0 24px}.suggestions{gap:9px}.suggestion{padding:12px}.suggestion-icon{width:27px;height:27px;flex-basis:27px}.suggestion strong{font-size:11px}.suggestion span:last-child{font-size:10px}.online{font-size:10px;padding:6px 8px}.bottom-meta{flex-wrap:wrap}.composer-area{padding-top:14px}}
     @media(max-width:430px){.suggestions{grid-template-columns:1fr}.welcome{margin-top:10px}.orb{width:56px;height:56px;border-radius:18px;font-size:26px;margin-bottom:18px}h1{letter-spacing:-1.5px}.suggestion{align-items:center}.suggestion span:last-child{font-size:11px}.page-sub{display:none}.message-body{font-size:12px;padding:11px 12px}}
+    .site-footer{padding:10px 18px 22px;text-align:center;color:#69728e;font-size:10px;line-height:1.8}.site-footer strong{color:#aab2cc;font-weight:650}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
@@ -53,6 +54,11 @@
       <div class="composer-area"><form class="composer" id="form"><input id="input" name="message" maxlength="4000" placeholder="Message Lucky..." autocomplete="off" aria-label="Your message" required><button class="send" id="send" type="submit" aria-label="Send message">↑</button></form><div class="composer-hint">Press Enter to send · Your conversations are kept in this page session only</div></div>
     </div>
     <div class="bottom-meta"><span>Python</span><span class="dot"></span><span>FastAPI</span><span class="dot"></span><span>Groq-powered AI</span><span class="dot"></span><span>AI can make mistakes</span></div>
+    <footer class="site-footer">
+      <div>© 2026 <strong>Srinivas M.</strong> All rights reserved.</div>
+      <div>Lucky AI Assistant V2 · Built with Python, FastAPI &amp; Groq.</div>
+      <div>AI responses may be inaccurate. Please verify important information.</div>
+    </footer>
   </main>
 </div>
 <script>
