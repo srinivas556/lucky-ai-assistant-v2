@@ -1,620 +1,173 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101b33">
-  <meta name="description" content="Meet Lucky, an AI-powered personal assistant built with Python, FastAPI and Groq.">
-  <title>Lucky — Your AI Assistant</title>
-
+  <meta name="theme-color" content="#090b14">
+  <meta name="description" content="Lucky V2 — an online AI assistant built with Python, FastAPI and Groq.">
+  <title>Lucky V2 — AI Workspace</title>
   <style>
-    :root {
-      --navy: #101b33;
-      --blue: #356df3;
-      --blue-dark: #2455d6;
-      --muted: #697890;
-      --border: #e1e7f0;
-      --bg: #f5f7fb;
-      --white: #ffffff;
-      --green: #16a36a;
-      --shadow: 0 18px 55px rgba(16, 27, 51, 0.08);
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: #263247;
-      font: 16px/1.65 Inter, system-ui, -apple-system,
-            "Segoe UI", sans-serif;
-    }
-
-    a { color: inherit; text-decoration: none; }
-
-    button, input { font: inherit; }
-
-    button:focus-visible, a:focus-visible, input:focus-visible {
-      outline: 3px solid #91adff;
-      outline-offset: 3px;
-    }
-
-    .wrap {
-      width: min(1080px, calc(100% - 36px));
-      margin: auto;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: rgba(255, 255, 255, .94);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    nav {
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
-    .brand {
-      font-size: 24px;
-      font-weight: 850;
-      letter-spacing: -1px;
-      color: var(--navy);
-    }
-
-    .brand span { color: var(--blue); }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      font-size: 14px;
-      font-weight: 650;
-    }
-
-    .nav-links a:last-child { color: var(--blue); }
-
-    .hero {
-      padding: 82px 0 65px;
-      background:
-        radial-gradient(ellipse at 85% 20%, #dce6ff 0, transparent 40%),
-        linear-gradient(135deg, #fff, #edf2ff);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .eyebrow {
-      color: var(--blue);
-      font-size: 12px;
-      letter-spacing: 1.8px;
-      font-weight: 850;
-      text-transform: uppercase;
-    }
-
-    .hero h1 {
-      max-width: 760px;
-      color: var(--navy);
-      font-size: clamp(42px, 7vw, 72px);
-      line-height: 1.05;
-      letter-spacing: -3px;
-      margin: 16px 0;
-    }
-
-    .hero h1 span { color: var(--blue); }
-
-    .hero p {
-      max-width: 690px;
-      color: var(--muted);
-      font-size: clamp(16px, 2vw, 19px);
-      margin: 18px 0 0;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin-top: 25px;
-    }
-
-    .tag {
-      background: rgba(255, 255, 255, .85);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    section { padding: 64px 0; }
-
-    .heading {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .heading h2 {
-      color: var(--navy);
-      font-size: clamp(28px, 4vw, 38px);
-      line-height: 1.2;
-      letter-spacing: -1px;
-      margin: 8px 0;
-    }
-
-    .heading p {
-      color: var(--muted);
-      margin: 8px auto 0;
-      max-width: 620px;
-    }
-
-    .panel {
-      max-width: 800px;
-      margin: auto;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .chat-header {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      padding: 17px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .avatar {
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #356df3, #735cf4);
-      color: white;
-      font-size: 21px;
-      font-weight: 850;
-    }
-
-    .chat-title { color: var(--navy); font-weight: 800; }
-
-    .sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .status {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      margin-right: 5px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
-    .clear {
-      margin-left: auto;
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--muted);
-      border-radius: 9px;
-      padding: 8px 11px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .clear:hover { background: var(--bg); }
-
-    .messages {
-      height: 390px;
-      overflow-y: auto;
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      background: #fbfcff;
-      scroll-behavior: smooth;
-    }
-
-    .bubble {
-      max-width: 86%;
-      padding: 12px 15px;
-      border-radius: 15px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      font-size: 14px;
-      line-height: 1.65;
-    }
-
-    .bot {
-      align-self: flex-start;
-      background: white;
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 5px;
-    }
-
-    .user {
-      align-self: flex-end;
-      background: var(--blue);
-      color: white;
-      border-bottom-right-radius: 5px;
-    }
-
-    .chat-form {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px;
-      border-top: 1px solid var(--border);
-      background: white;
-    }
-
-    .chat-form input {
-      flex: 1;
-      min-width: 0;
-      border: 1px solid #d9e1ee;
-      border-radius: 12px;
-      padding: 13px 15px;
-      background: #fbfcff;
-      outline-color: var(--blue);
-    }
-
-    .send {
-      border: 0;
-      border-radius: 12px;
-      padding: 13px 19px;
-      background: var(--blue);
-      color: white;
-      font-weight: 750;
-      cursor: pointer;
-      transition: background .2s;
-    }
-
-    .send:hover { background: var(--blue-dark); }
-    button:disabled { opacity: .55; cursor: wait; }
-
-    .error {
-      display: none;
-      padding: 10px 16px;
-      color: #b42318;
-      font-size: 13px;
-      background: #fff7f6;
-    }
-
-    .error.visible { display: block; }
-
-    .note {
-      padding: 0 16px 16px;
-      color: #7a879a;
-      font-size: 11px;
-      background: white;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 17px;
-    }
-
-    .feature {
-      padding: 23px;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-    }
-
-    .feature-icon {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: #edf2ff;
-      color: var(--blue);
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .feature h3 {
-      color: var(--navy);
-      margin: 15px 0 7px;
-      font-size: 17px;
-    }
-
-    .feature p {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 0;
-    }
-
-    footer {
-      text-align: center;
-      padding: 27px 18px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-      background: white;
-    }
-
-    footer a { color: var(--blue); font-weight: 700; }
-
-    @media (max-width: 650px) {
-      .wrap { width: min(100% - 24px, 1080px); }
-      .hero { padding: 58px 0 45px; }
-      .hero h1 { letter-spacing: -2px; }
-      section { padding: 45px 0; }
-      .features { grid-template-columns: 1fr; }
-      .messages { height: 350px; padding: 15px; }
-      .bubble { max-width: 94%; }
-      .chat-header { padding: 13px; }
-      .chat-form { padding: 11px; gap: 7px; }
-      .chat-form input { padding: 12px 10px; }
-      .send { padding: 12px 13px; }
-      .clear { padding: 7px; }
-      .nav-links { gap: 12px; font-size: 12px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-      }
-    }
+    :root{color-scheme:dark;--bg:#090b14;--panel:#111525;--panel2:#0e1220;--line:rgba(177,190,255,.13);--text:#f2f4ff;--muted:#929bb8;--cyan:#67e8f9;--violet:#a78bfa;--green:#86efac;--shadow:0 24px 80px rgba(0,0,0,.3)}
+    *{box-sizing:border-box}html,body{height:100%;margin:0}body{font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(ellipse at 72% -15%,rgba(124,58,237,.17),transparent 38rem),radial-gradient(ellipse at 100% 70%,rgba(14,165,233,.08),transparent 34rem),var(--bg)}
+    button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}button{cursor:pointer}
+    .app{min-height:100%;display:grid;grid-template-columns:258px minmax(0,1fr)}
+    .sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;padding:24px 16px;border-right:1px solid var(--line);background:rgba(10,13,24,.8);backdrop-filter:blur(20px);z-index:5}
+    .brand{display:flex;align-items:center;gap:11px;padding:3px 9px 25px;font-size:21px;font-weight:800;letter-spacing:-.7px}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:13px;color:#09101c;font-size:21px;background:linear-gradient(135deg,var(--violet),var(--cyan));box-shadow:0 6px 24px rgba(103,232,249,.13)}.brand small{display:block;font-size:9px;letter-spacing:2px;color:var(--muted);font-weight:750;margin-top:1px}
+    .new-chat{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:12px;border:1px solid rgba(167,139,250,.32);border-radius:13px;background:linear-gradient(110deg,rgba(167,139,250,.14),rgba(103,232,249,.08));color:#f3f2ff;font-weight:700}.new-chat:hover{background:linear-gradient(110deg,rgba(167,139,250,.23),rgba(103,232,249,.13))}
+    .side-label{margin:29px 10px 10px;color:#69728f;font-size:10px;font-weight:800;letter-spacing:1.7px}.side-link{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;color:#aab2cc;font-size:13px}.side-link:hover{background:rgba(255,255,255,.045);color:var(--text)}.side-link.active{background:rgba(103,232,249,.075);color:var(--cyan)}.side-link .symbol{width:19px;text-align:center;font-size:16px}.side-spacer{flex:1}.version-card{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}.version-title{font-size:11px;color:var(--muted);margin-bottom:10px}.version-option{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:9px;font-size:12px;color:#aab2cc}.version-option.current{background:rgba(103,232,249,.09);color:var(--cyan);border:1px solid rgba(103,232,249,.12)}.version-option .pill{font-size:9px;letter-spacing:.5px;padding:3px 6px;border-radius:5px;background:rgba(103,232,249,.12)}.side-footer{padding:15px 8px 0;color:#626b86;font-size:11px}
+    .main{min-width:0;min-height:100vh;display:flex;flex-direction:column}.topbar{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,48px);border-bottom:1px solid var(--line);background:rgba(9,11,20,.38)}.top-left{display:flex;align-items:center;gap:12px}.mobile-menu{display:none;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);padding:8px 10px}.page-name{font-size:13px;font-weight:700}.page-sub{font-size:11px;color:var(--muted);margin-top:2px}.online{display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:#b9c4d8;font-size:11px;background:rgba(255,255,255,.025)}.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(134,239,172,.55)}
+    .workspace{width:min(900px,100%);margin:0 auto;padding:clamp(28px,6vh,68px) 28px 18px;flex:1;display:flex;flex-direction:column}.welcome{margin:auto 0 28px;text-align:center;animation:rise .5s ease both}.orb{width:66px;height:66px;margin:0 auto 23px;display:grid;place-items:center;border-radius:22px;background:linear-gradient(135deg,rgba(167,139,250,.22),rgba(103,232,249,.15));border:1px solid rgba(173,190,255,.2);box-shadow:0 0 60px rgba(124,58,237,.12);font-size:30px;color:var(--cyan)}.eyebrow{font-size:10px;letter-spacing:2.4px;font-weight:800;color:var(--cyan)}h1{font-size:clamp(34px,5vw,52px);line-height:1.12;letter-spacing:-2.2px;margin:13px 0 14px}.gradient{background:linear-gradient(100deg,#c4b5fd 12%,#67e8f9 80%);-webkit-background-clip:text;background-clip:text;color:transparent}.welcome-copy{max-width:530px;margin:0 auto;color:var(--muted);font-size:14px}.suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;max-width:650px;width:100%;margin:28px auto 0}.suggestion{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:15px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012));color:var(--text);transition:transform .18s,border-color .18s,background .18s}.suggestion:hover{transform:translateY(-2px);border-color:rgba(103,232,249,.32);background:rgba(103,232,249,.045)}.suggestion-icon{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:9px;background:rgba(167,139,250,.13);color:#c4b5fd}.suggestion strong{display:block;font-size:12px;margin:1px 0 4px}.suggestion span:last-child{display:block;font-size:11px;line-height:1.5;color:var(--muted)}
+    .messages{display:none;flex-direction:column;gap:19px;padding:8px 0 24px;min-height:100px}.messages.active{display:flex}.message{display:flex;gap:12px;align-items:flex-start;animation:rise .22s ease both}.message.user{flex-direction:row-reverse}.message-avatar{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#09101c;font-weight:850;font-size:13px}.message.user .message-avatar{background:#202640;border:1px solid var(--line);color:#e8ebff}.message-body{max-width:min(680px,calc(100% - 45px));padding:12px 15px;border:1px solid var(--line);border-radius:4px 15px 15px 15px;background:rgba(255,255,255,.035);white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.75;color:#e5e9fa}.message.user .message-body{border-radius:15px 4px 15px 15px;background:linear-gradient(120deg,rgba(124,58,237,.26),rgba(37,99,235,.22));border-color:rgba(167,139,250,.2)}.error{display:none;margin:0 0 12px;padding:11px 14px;border:1px solid rgba(248,113,113,.22);border-radius:10px;background:rgba(127,29,29,.18);color:#fca5a5;font-size:12px}.error.visible{display:block}
+    .composer-area{position:sticky;bottom:0;padding:16px 0 12px;background:linear-gradient(180deg,transparent,rgba(9,11,20,.95) 22%)}.composer{display:flex;align-items:flex-end;gap:12px;padding:12px;border:1px solid rgba(177,190,255,.2);border-radius:19px;background:rgba(17,21,37,.94);box-shadow:var(--shadow);backdrop-filter:blur(20px)}.composer:focus-within{border-color:rgba(103,232,249,.42);box-shadow:0 0 0 3px rgba(103,232,249,.045),var(--shadow)}.composer input{width:100%;min-width:0;padding:9px 7px;border:0;outline:0!important;background:transparent;color:var(--text);font-size:14px}.composer input::placeholder{color:#747e9d}.send{flex:0 0 auto;width:42px;height:42px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#09101c;font-weight:900;font-size:19px;box-shadow:0 5px 18px rgba(103,232,249,.12)}.send:hover{filter:brightness(1.1)}.send:disabled{opacity:.45;cursor:wait}.composer-hint{text-align:center;color:#626b86;font-size:10px;padding-top:10px}.bottom-meta{display:flex;justify-content:center;gap:8px;align-items:center;color:#69728e;font-size:10px;padding:0 0 15px}.bottom-meta .dot{width:3px;height:3px;border-radius:50%;background:#59617a}
+    @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:0;width:270px;transform:translateX(-105%);transition:transform .22s ease;box-shadow:var(--shadow)}.sidebar.open{transform:translateX(0)}.mobile-menu{display:block}.topbar{height:62px;padding:0 16px}.workspace{padding:35px 17px 12px}.welcome{margin:auto 0 24px}.suggestions{gap:9px}.suggestion{padding:12px}.suggestion-icon{width:27px;height:27px;flex-basis:27px}.suggestion strong{font-size:11px}.suggestion span:last-child{font-size:10px}.online{font-size:10px;padding:6px 8px}.bottom-meta{flex-wrap:wrap}.composer-area{padding-top:14px}}
+    @media(max-width:430px){.suggestions{grid-template-columns:1fr}.welcome{margin-top:10px}.orb{width:56px;height:56px;border-radius:18px;font-size:26px;margin-bottom:18px}h1{letter-spacing:-1.5px}.suggestion{align-items:center}.suggestion span:last-child{font-size:11px}.page-sub{display:none}.message-body{font-size:12px;padding:11px 12px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
-
 <body>
-  <header>
-    <nav class="wrap" aria-label="Main navigation">
-      <a class="brand" href="#home" aria-label="Lucky home">Lucky<span>.</span></a>
-      <div class="nav-links">
-        <a href="#chat">Try Lucky</a>
-        <a href="https://github.com/srinivas556/lucky-ai-assistant-v2"
-           target="_blank" rel="noopener noreferrer">View source ↗</a>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <section class="hero" id="home">
-      <div class="wrap">
-        <div class="eyebrow">YOUR PERSONAL AI ASSISTANT</div>
-        <h1>Meet Lucky.<br>Your ideas, <span>in action.</span></h1>
-        <p>
-          Lucky is an AI-powered assistant built with Python and FastAPI,
-          using Groq for online AI responses. Ask questions, explore ideas,
-          and get help with your everyday tasks.
-        </p>
-        <div class="tags" aria-label="Technologies">
-          <span class="tag">Python</span>
-          <span class="tag">FastAPI</span>
-          <span class="tag">Groq API</span>
-          <span class="tag">LLMs</span>
-          <span class="tag">Prompt Engineering</span>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Lucky navigation">
+    <a class="brand" href="#home" aria-label="Lucky home"><span class="brand-mark">✦</span><span>Lucky<small>AI WORKSPACE</small></span></a>
+    <button class="new-chat" id="newChat" type="button"><span>＋</span> New chat</button>
+    <div class="side-label">WORKSPACE</div>
+    <a class="side-link active" href="#home" id="homeLink"><span class="symbol">⌂</span> Assistant</a>
+    <a class="side-link" href="https://github.com/srinivas556/lucky-ai-assistant-v2" target="_blank" rel="noopener noreferrer"><span class="symbol">⌘</span> Source code <span aria-hidden="true">↗</span></a>
+    <div class="side-spacer"></div>
+    <div class="version-card"><div class="version-title">CHOOSE YOUR LUCKY</div><a class="version-option" href="https://srinivas556.github.io/lucky-local-ai-assistant/"><span>◉ &nbsp; Local AI · V1</span><span>↗</span></a><div class="version-option current" aria-current="page"><span>✦ &nbsp; Online AI · V2</span><span class="pill">CURRENT</span></div></div>
+    <div class="side-footer">Lucky AI Assistant · Built with Python</div>
+  </aside>
+  <main class="main" id="home">
+    <header class="topbar"><div class="top-left"><button class="mobile-menu" id="menuToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button><div><div class="page-name">Lucky Assistant</div><div class="page-sub">A little help for your next big idea.</div></div></div><div class="online"><span class="online-dot"></span> Online AI <span aria-hidden="true">·</span> V2</div></header>
+    <div class="workspace" id="chat">
+      <section class="welcome" id="welcome" aria-labelledby="welcomeTitle"><div class="orb" aria-hidden="true">✦</div><div class="eyebrow">YOUR PERSONAL AI WORKSPACE</div><h1 id="welcomeTitle">What can we <span class="gradient">work on?</span></h1><p class="welcome-copy">Your space to learn, build, and explore. Ask Lucky a question, share an idea, or choose a starting point below.</p>
+        <div class="suggestions" aria-label="Suggested prompts">
+          <button class="suggestion" type="button" data-prompt="Explain a difficult computer science concept in simple steps, with an example."><span class="suggestion-icon">⌘</span><span><strong>Understand a concept</strong><span>Break down a tricky topic step by step.</span></span></button>
+          <button class="suggestion" type="button" data-prompt="Help me debug a Python program. Explain how to find the bug and fix it."><span class="suggestion-icon">{ }</span><span><strong>Debug some code</strong><span>Work through a programming problem.</span></span></button>
+          <button class="suggestion" type="button" data-prompt="Help me create a practical study plan with clear priorities and milestones."><span class="suggestion-icon">◷</span><span><strong>Plan my next steps</strong><span>Turn a goal into a practical plan.</span></span></button>
+          <button class="suggestion" type="button" data-prompt="Suggest three useful AI project ideas and explain their core features."><span class="suggestion-icon">✧</span><span><strong>Explore an idea</strong><span>Find a direction for your next project.</span></span></button>
         </div>
-      </div>
-    </section>
-
-    <section id="chat">
-      <div class="wrap">
-        <div class="heading">
-          <div class="eyebrow">INTERACTIVE EXPERIENCE</div>
-          <h2>Chat with Lucky</h2>
-          <p>Start a conversation with your online AI assistant.</p>
-        </div>
-
-        <div class="panel">
-          <div class="chat-header">
-            <div class="avatar" aria-hidden="true">L</div>
-            <div>
-              <div class="chat-title">Lucky Assistant</div>
-              <div class="sub">
-                <span class="status" aria-hidden="true"></span>
-                Connected to Lucky's online AI service
-              </div>
-            </div>
-            <button class="clear" id="clear" type="button">Clear chat</button>
-          </div>
-
-          <div class="messages" id="messages" role="log"
-               aria-live="polite" aria-relevant="additions text">
-            <div class="bubble bot">
-              Hey! I'm Lucky. 👋 What would you like to explore today?
-            </div>
-          </div>
-
-          <div class="error" id="error" role="alert"></div>
-
-          <form class="chat-form" id="form">
-            <input
-              id="input"
-              name="message"
-              maxlength="4000"
-              placeholder="Message Lucky..."
-              autocomplete="off"
-              aria-label="Your message"
-              required
-            >
-            <button class="send" id="send" type="submit">Send ↑</button>
-          </form>
-
-          <div class="note">
-            AI responses may be inaccurate. Avoid sharing passwords,
-            API keys, or sensitive personal information.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="features">
-      <div class="wrap">
-        <div class="heading">
-          <div class="eyebrow">BUILT WITH PURPOSE</div>
-          <h2>Simple. Useful. Extensible.</h2>
-          <p>A foundation for building a more capable personal AI assistant.</p>
-        </div>
-
-        <div class="features">
-          <article class="feature">
-            <div class="feature-icon" aria-hidden="true">01</div>
-            <h3>Natural conversations</h3>
-            <p>Ask questions and receive AI-generated responses through a clean chat interface.</p>
-          </article>
-
-          <article class="feature">
-            <div class="feature-icon" aria-hidden="true">02</div>
-            <h3>Python-powered backend</h3>
-            <p>A FastAPI service connects the webpage to the hosted AI model.</p>
-          </article>
-
-          <article class="feature">
-            <div class="feature-icon" aria-hidden="true">03</div>
-            <h3>Built to evolve</h3>
-            <p>A modular project foundation for future assistant features and improvements.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+      </section>
+      <section class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation"></section>
+      <div class="error" id="error" role="alert"></div>
+      <div class="composer-area"><form class="composer" id="form"><input id="input" name="message" maxlength="4000" placeholder="Message Lucky..." autocomplete="off" aria-label="Your message" required><button class="send" id="send" type="submit" aria-label="Send message">↑</button></form><div class="composer-hint">Press Enter to send · Your conversations are kept in this page session only</div></div>
+    </div>
+    <div class="bottom-meta"><span>Python</span><span class="dot"></span><span>FastAPI</span><span class="dot"></span><span>Groq-powered AI</span><span class="dot"></span><span>AI can make mistakes</span></div>
   </main>
+</div>
+<script>
+(() => {
+  'use strict';
+  const API_URL = 'https://lucky-ai-assistant-v2.onrender.com/api/chat';
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const send = document.getElementById('send');
+  const messages = document.getElementById('messages');
+  const welcome = document.getElementById('welcome');
+  const error = document.getElementById('error');
+  const newChat = document.getElementById('newChat');
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menuToggle');
+  let history = [];
+  let busy = false;
 
-  <footer>
-    Lucky AI Assistant · Python · FastAPI · Groq
-    <br>
-    <a href="https://github.com/srinivas556/lucky-ai-assistant-v2"
-       target="_blank" rel="noopener noreferrer">Explore the project on GitHub ↗</a>
-  </footer>
-
-  <script>
-    (() => {
-      "use strict";
-
-      const API_URL =
-        "https://lucky-ai-assistant-v2.onrender.com/api/chat";
-
-      const form = document.getElementById("form");
-      const input = document.getElementById("input");
-      const send = document.getElementById("send");
-      const messages = document.getElementById("messages");
-      const error = document.getElementById("error");
-      const clear = document.getElementById("clear");
-
-      let history = [];
-      let busy = false;
-
-      function addMessage(text, role) {
-        const element = document.createElement("div");
-        element.className = "bubble " +
-          (role === "user" ? "user" : "bot");
-        element.textContent = text;
-        messages.appendChild(element);
-        messages.scrollTop = messages.scrollHeight;
-        return element;
-      }
-
-      function showError(message) {
-        error.textContent = message;
-        error.classList.add("visible");
-      }
-
-      function hideError() {
-        error.textContent = "";
-        error.classList.remove("visible");
-      }
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const message = input.value.trim();
-        if (!message || busy) return;
-
-        busy = true;
-        send.disabled = true;
-        input.disabled = true;
-        clear.disabled = true;
-        hideError();
-
-        addMessage(message, "user");
-        input.value = "";
-
-        const pending = addMessage("Lucky is thinking…", "assistant");
-
-        try {
-          const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              message,
-              history: history.slice(-10)
-            })
-          });
-
-          const data = await response.json().catch(() => ({}));
-
-          if (!response.ok) {
-            throw new Error(
-              data.detail || `Request failed (HTTP ${response.status}).`
-            );
-          }
-
-          if (typeof data.reply !== "string" || !data.reply.trim()) {
-            throw new Error("Lucky returned an empty response.");
-          }
-
-          pending.textContent = data.reply;
-
-          history.push(
-            { role: "user", content: message },
-            { role: "assistant", content: data.reply }
-          );
-
-          history = history.slice(-10);
-        } catch (err) {
-          pending.textContent = "I couldn't get a response this time.";
-
-          if (err instanceof TypeError) {
-            showError(
-              "Unable to connect to Lucky. The service may be waking up, " +
-              "or the frontend's CORS origin may need configuration."
-            );
-          } else {
-            showError(err.message || "Something went wrong. Please try again.");
-          }
-        } finally {
-          busy = false;
-          send.disabled = false;
-          input.disabled = false;
-          clear.disabled = false;
-          input.focus();
-          messages.scrollTop = messages.scrollHeight;
-        }
+  function showConversation() {
+    welcome.hidden = true;
+    messages.classList.add('active');
+  }
+  function addMessage(text, role) {
+    showConversation();
+    const row = document.createElement('div');
+    row.className = 'message ' + (role === 'user' ? 'user' : 'assistant');
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = role === 'user' ? 'Y' : '✦';
+    avatar.setAttribute('aria-hidden', 'true');
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    body.textContent = text;
+    row.append(avatar, body);
+    messages.appendChild(row);
+    row.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return body;
+  }
+  function showError(message) {
+    error.textContent = message;
+    error.classList.add('visible');
+  }
+  function hideError() {
+    error.textContent = '';
+    error.classList.remove('visible');
+  }
+  function closeMobileMenu() {
+    sidebar.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+  async function sendMessage(raw) {
+    const message = raw.trim();
+    if (!message || busy) return;
+    busy = true;
+    send.disabled = true;
+    input.disabled = true;
+    newChat.disabled = true;
+    hideError();
+    addMessage(message, 'user');
+    input.value = '';
+    const pending = addMessage('Lucky is thinking…', 'assistant');
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({message, history: history.slice(-10)})
       });
-
-      clear.addEventListener("click", () => {
-        if (busy) return;
-
-        history = [];
-        messages.replaceChildren();
-        hideError();
-
-        addMessage(
-          "Chat cleared! What would you like to ask?",
-          "assistant"
-        );
-        input.focus();
-      });
-    })();
-  </script>
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || `Request failed (HTTP ${response.status}).`);
+      if (typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('Lucky returned an empty response. Please try again.');
+      pending.textContent = data.reply;
+      history.push({role:'user',content:message},{role:'assistant',content:data.reply});
+      history = history.slice(-10);
+    } catch (err) {
+      pending.textContent = 'I couldn’t get a response this time.';
+      if (err instanceof TypeError) showError('Unable to connect to Lucky. The service may be waking up, or there may be a network/CORS issue. Please wait a moment and try again.');
+      else showError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      busy = false;
+      send.disabled = false;
+      input.disabled = false;
+      newChat.disabled = false;
+      input.focus();
+    }
+  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    sendMessage(input.value);
+  });
+  document.querySelectorAll('[data-prompt]').forEach(button => {
+    button.addEventListener('click', () => {
+      input.value = button.dataset.prompt || '';
+      input.focus();
+      if (window.matchMedia('(max-width: 760px)').matches) closeMobileMenu();
+    });
+  });
+  newChat.addEventListener('click', () => {
+    if (busy) return;
+    history = [];
+    messages.replaceChildren();
+    messages.classList.remove('active');
+    welcome.hidden = false;
+    hideError();
+    input.value = '';
+    closeMobileMenu();
+    input.focus();
+  });
+  menuToggle.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', String(open));
+  });
+  document.getElementById('homeLink').addEventListener('click', () => {
+    closeMobileMenu();
+  });
+})();
+</script>
 </body>
 </html>
